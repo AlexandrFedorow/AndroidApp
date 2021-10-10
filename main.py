@@ -1,35 +1,68 @@
 from kivy.app import App
 from kivy.uix.label import Label
 from kivy.uix.button import Button
+from kivy.uix.widget import Widget
+from kivy.uix.gridlayout import GridLayout
 from kivy.uix.boxlayout import BoxLayout
-
 from kivy.core.window import Window
-
-from random import randint
-
-Window.size = (300, 100)
-Window.clearcolor = (255/255, 186/255, 3/255, 1)
-Window.title = "Топовая приложуха"
+from kivy.config import Config
 
 
+Config.set('graphics', 'resizable', 0)
+Config.set('graphics', 'width', 400)
+Config.set('graphics', 'height', 500)
 
 class MyApp(App):
+    def update_lable(self):
+        self.lbl.text = self.formula
 
-    def __init__(self):
-        super().__init__()
-        self.label = Label(text='jija')
+    def add_number(self, instance):
+        if self.formula == '0':
+            self.formula = ''
+        self.formula += str(instance.text)
+        self.update_lable()
 
-    def btn_pressed(self, *args):
-        self.label.color = (randint(0, 255)/255, randint(0, 255)/255, randint(0, 255)/255)
+    def add_operation(self, instance):
+        if str(instance.text) == 'X':
+            self.formula += '*'
+        else:
+            self.formula += str(instance.text)
+        self.update_lable()
+
+    def culc(self, instance):
+        self.lbl.text = str(eval(self.lbl.text))
+        self.formula = '0'
 
     def build(self):
-        box = BoxLayout()
-        btn = Button(text='gg')
-        btn.bind(on_press=self.btn_pressed)
-        box.add_widget(self.label)
-        box.add_widget(btn)
+        self.formula = '0'
+        bl = BoxLayout(orientation='vertical', padding=25)
+        gi = GridLayout(cols=4, spacing=3, size_hint=(1, .6))
+        self.lbl = Label(text='0', font_size=40, halign='right', valign='center', size_hint=(1, .4), text_size=(500-50, 500 * .4 - 50))
+        bl.add_widget(self.lbl)
+        
+        gi.add_widget(Button(text='7', on_press=self.add_number))
+        gi.add_widget(Button(text='8', on_press=self.add_number))
+        gi.add_widget(Button(text='9', on_press=self.add_number))
+        gi.add_widget(Button(text='X', on_press=self.add_operation))
 
-        return box
+        gi.add_widget(Button(text='4', on_press=self.add_number))
+        gi.add_widget(Button(text='5', on_press=self.add_number))
+        gi.add_widget(Button(text='6', on_press=self.add_number))
+        gi.add_widget(Button(text='-', on_press=self.add_operation))
+
+        gi.add_widget(Button(text='1', on_press=self.add_number))
+        gi.add_widget(Button(text='2', on_press=self.add_number))
+        gi.add_widget(Button(text='3', on_press=self.add_number))
+        gi.add_widget(Button(text='+', on_press=self.add_operation))
+
+        gi.add_widget(Widget())
+        gi.add_widget(Button(text='0', on_press=self.add_number))
+        gi.add_widget(Button(text='.', on_press=self.add_operation))
+        gi.add_widget(Button(text='=', on_press=self.culc))
+
+        bl.add_widget(gi)
+
+        return bl
 
 
 if __name__ == "__main__":
